@@ -1,0 +1,20 @@
+{
+    "Model_Name": "CancerFusion AI: Quad-Modal Pan-Cancer Platform",
+    "Validation_Cohort_Size": 350,
+    "Harrells_Concordance_Index": 0.8029,
+    "ROC_AUC": 0.8344,
+    "PR_AUC": 0.8217,
+    "Accuracy": 0.7629,
+    "Sensitivity_Recall": 0.7921,
+    "Specificity": 0.7326,
+    "Precision_PPV": 0.754,
+    "F1_Score": 0.7726,
+    "Brier_Score": 0.1781,
+    "Log_Rank_P_Value": "< 0.0001",
+    "Confusion_Matrix": {
+        "True_Negative": 126,
+        "False_Positive": 46,
+        "False_Negative": 37,
+        "True_Positive": 141
+    }
+}
