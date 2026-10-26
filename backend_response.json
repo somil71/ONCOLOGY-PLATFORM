@@ -1,0 +1,19 @@
+{
+    "patient_id": "TCGA-PAN-CANCER-VALIDATION-COHORT",
+    "prediction": {
+        "risk_score": 0.5124,
+        "uncertainty": 0.4921
+    },
+    "explainability": {
+        "attention_weights": {
+            "wsi": 0.2845,
+            "rad": 0.2412,
+            "rna": 0.2618,
+            "cli": 0.2125
+        }
+    },
+    "metrics": {
+        "c_index": 0.8029,
+        "total_validation_patients": 108
+    }
+}
