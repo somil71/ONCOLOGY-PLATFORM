@@ -24,22 +24,22 @@ The original pilot's perfect classification results used outcomes generated from
 
 These are survival ranking metrics, **not** accuracy, precision, recall, F1, or cancer-detection rates. The confidence intervals condition on fitted models and omit model-refitting and model-selection variability. Do not merge the BRCA and KIRC values into a single performance claim.
 
-Public aggregate evidence: [survival results](evidence/aggregate_survival_results.json). Detailed local run exports remain in the working copy and are excluded from Git because they contain patient-level predictions. See the [published-method comparison](RESEARCH_COMPARISON_AND_VALIDATION.md) for methods and limitations.
+Public aggregate evidence: [survival results](evidence/aggregate_survival_results.json). Detailed local run exports remain in the working copy and are excluded from Git because they contain patient-level predictions.
 
 ## Four-input image evidence and acquisition
 
-The rebuilt KIRC image feature preview contains 217 patients / 66 recorded deaths overall, with **43 WSI feature bags and 70 radiology CT feature bags**. An independent source/identity/valid-item-mean audit passed; strict complete-input availability is **27 patients / 7 deaths**. Seven events remain too sparse for a credible four-input survival evaluation. No four-input model was fit.
+The rebuilt KIRC image feature preview contains 217 patients / 66 recorded deaths overall, with **43 WSI feature bags and 70 radiology CT feature bags**. Independent source and feature reconstruction passed; strict complete-input availability is **27 patients / 7 deaths**. On the locked folds, complete-input test splits contain 2, 0, 2, 1, and 2 deaths. The audit explicitly recommends against fitting a four-input model. No four-input model was fit.
 
 The 19 November source audit now reopens the actual selected diagnostic SVS files and deterministically replays patch selection:
 
-- **37 of the originally audited WSI bags:** original SVS byte count and GDC MD5 checked; all **4,736 selected patches** re-extracted at the recorded coordinates; coordinates and tissue fractions match the sidecars exactly. The additional six feature bags passed the independent cohort reconstruction; the expanded 43-bag source replay is pending.
+- **43 of 43 WSI bags:** original SVS byte count and pinned GDC MD5 checked; all **5,504 selected patches** re-extracted at the recorded coordinates; coordinates and tissue fractions match the sidecars exactly.
 - **70 of 70 CT bags:** 5,081 selected source DICOM files rehashed; CT series identity, slice selection indices, and physical-position sidecars reconstructed.
 - CT headers were not independently reparsed by this additional audit. Existing acquisition QC reports DICOM identity, geometry, pixel decoding, and HU conversion, but clinical tumour coverage and acquisition timing remain unreviewed.
 - The WSI replay verifies source identity and patch selection/pixel QC, not ViT embedding replay, tumour annotation, stain normalization, or clinical-time eligibility.
 
-Public aggregate evidence: [imaging availability and replay counts](evidence/aggregate_imaging_audit.json). Detailed local audit files contain patient-level identifiers and remain excluded from Git.
+The expanded v9 source audit completed with scoped limitations. It does not reparse CT headers, verify tumour coverage with a radiologist, establish acquisition-time eligibility, or replay ViT embeddings. Public aggregate evidence: [imaging availability, replay counts, and locked fold event counts](evidence/aggregate_imaging_audit.json). Detailed local audit files contain patient-level identifiers and remain excluded from Git.
 
-The outcome-blind CT metadata selection has 171 patients / 50 recorded deaths, while the current CT feature cohort has 70 patients / 15 deaths. A bounded attempt to acquire additional outcome-blind WSI slides stalled on a public slide download and was stopped; it did not complete the remaining matched acquisitions. The resulting local rebuild increased WSI features from 37 to 43 and complete-input availability from 22 to 27 patients, still with 7 deaths. This is a technical input-count update only, not a four-input model result.
+The outcome-blind CT metadata selection has 171 patients / 50 recorded deaths, while the current CT feature cohort has 70 patients / 15 deaths. A bounded attempt to acquire the remaining outcome-blind WSI slides stalled on a public slide download and was stopped; it did not complete the remaining matched acquisitions. The available rebuild increased WSI features from 37 to 43 and complete-input availability from 22 to 27 patients, still with 7 deaths. This is a technical input-count update only, not a four-input model result.
 
 ## Fusion benefit and novelty
 
@@ -74,7 +74,7 @@ The platform's research figures should use source-linked clinical/RNA and uncert
 | Request | Status | Evidence / next gate |
 | --- | --- | --- |
 | Finish and independently verify Kaggle run; export metrics/log/checkpoint | **Not verifiable in this session** | Need accessible Kaggle run output and export; local project has no completed artifact for the latest command |
-| Expand matched, QC-passed imaging cohort | **Partially completed; acquisition stalled** | Available WSI bags increased 37→43 and the independently reconstructed complete intersection increased 22→27 patients (7 deaths). Additional public GDC download stalled; no four-input model fit. |
+| Expand matched, QC-passed imaging cohort | **Partially completed; acquisition stalled** | Replayed all 43 available WSI bags (5,504 patches) and rehashed 70 CT bags (5,081 selected slices). Complete intersection increased 22→27 patients (7 deaths); remaining GDC downloads stalled. |
 | Run 15 four-input comparisons or limit paper to clinical/RNA | **Paper scope limited to clinical/RNA** | No four-input model was fit; complete-input n=27 / 7 deaths makes the locked fold evaluation unfit for the intended claim |
 | Validate uncertainty with independent calibration and test data | **Not complete** | Disagreement tested on held-out outcomes, but calibrated confidence/error probability not validated; preserve explicit no-confidence language |
 | Revise paper/platform claims | **Revised locally** | This scope report, React evidence page, and figure API point to verified clinical/RNA evidence and exclude generated-label plots |

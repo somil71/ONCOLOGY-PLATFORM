@@ -12,11 +12,15 @@
   "strict_four_input_intersection": {"patients": 27, "observed_OS_deaths": 7},
   "independent_cohort_reconstruction": "passed",
   "original_source_replay": {
-    "previously_audited_WSI_bags": 37,
-    "replayed_WSI_patches": 4736,
+    "WSI_bags_replayed": 43,
+    "replayed_WSI_patches": 5504,
     "CT_bags": 70,
     "rehashed_selected_DICOM_slices": 5081,
-    "expanded_43_bag_WSI_replay": "pending"
+    "independent_source_reproducibility_status": "completed_with_scoped_limitations",
+    "CT_headers_reparsed": false,
+    "radiologist_tumour_coverage_review_complete": false,
+    "acquisition_timing_verified": false
   },
+  "locked_outer_test_fold_complete_input_events": [2, 0, 2, 1, 2],
   "modeling_decision": "No four-input survival model was fit. Seven deaths are inadequate for the intended locked evaluation; this is technical feasibility evidence only."
 }
