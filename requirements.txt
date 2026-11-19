@@ -19,8 +19,10 @@ lifelines>=0.27.0
 matplotlib>=3.7.0
 seaborn>=0.12.0
 
-# Clinical Web Platform & Interactive Decision Support
-streamlit>=1.28.0
+# Local research API and legacy Streamlit interface
+fastapi>=0.111,<1
+uvicorn>=0.29,<1
+streamlit==1.46.1
 
 # Development & Notebook Utilities
 jupyter>=1.0.0

@@ -1,0 +1,57 @@
+{
+  "repository": "https://github.com/luisvalesilva/multisurv",
+  "commit": "deb35e12502f61a59726bfb543210735406d5959",
+  "retrieved_utc": "2026-11-18T10:51:37.818702+00:00",
+  "license": "MIT; original LICENSE retained",
+  "files": [
+    {
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/luisvalesilva/multisurv/deb35e12502f61a59726bfb543210735406d5959/LICENSE",
+      "bytes": 1062,
+      "sha256": "c7e05927494daf9db9d845aa40a30dcb1d23779c84ccf2578f46504565461212"
+    },
+    {
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/luisvalesilva/multisurv/deb35e12502f61a59726bfb543210735406d5959/README.md",
+      "bytes": 4215,
+      "sha256": "0539ef85940b9d957849b7b98d9f344aecfb62081e83cca216fc1e9d3b43033c"
+    },
+    {
+      "path": "environment.yml",
+      "url": "https://raw.githubusercontent.com/luisvalesilva/multisurv/deb35e12502f61a59726bfb543210735406d5959/environment.yml",
+      "bytes": 6361,
+      "sha256": "db49aa53290b777c0d35af2d51f4762d9644eef7f6e6d4fd320415b91052e4cc"
+    },
+    {
+      "path": "src/multisurv.py",
+      "url": "https://raw.githubusercontent.com/luisvalesilva/multisurv/deb35e12502f61a59726bfb543210735406d5959/src/multisurv.py",
+      "bytes": 5041,
+      "sha256": "8b8301c3ebd1b5303da49ffba0cd021278c379153ab79baf5bebbc00061d6acb"
+    },
+    {
+      "path": "src/sub_models.py",
+      "url": "https://raw.githubusercontent.com/luisvalesilva/multisurv/deb35e12502f61a59726bfb543210735406d5959/src/sub_models.py",
+      "bytes": 7904,
+      "sha256": "03407bd0a7bbbe12c89862cef66f918cffe3a04668d221705cd7ae5beef4617e"
+    },
+    {
+      "path": "src/loss.py",
+      "url": "https://raw.githubusercontent.com/luisvalesilva/multisurv/deb35e12502f61a59726bfb543210735406d5959/src/loss.py",
+      "bytes": 2709,
+      "sha256": "9fe1b4091c9c2b75b9b582a5be2c115bf9e6d9128a9cab0538241227abf3d6d6"
+    },
+    {
+      "path": "src/attention.py",
+      "url": "https://raw.githubusercontent.com/luisvalesilva/multisurv/deb35e12502f61a59726bfb543210735406d5959/src/attention.py",
+      "bytes": 1459,
+      "sha256": "b8630d48368f8e654a4527738609cf7cdb3f7c0f1a49c882b8d521a6a5aa4a97"
+    },
+    {
+      "path": "src/embrace_net.py",
+      "url": "https://raw.githubusercontent.com/luisvalesilva/multisurv/deb35e12502f61a59726bfb543210735406d5959/src/embrace_net.py",
+      "bytes": 1851,
+      "sha256": "3b0859e0ae16e965790da0e3643804361569086d6d2c2623cf8cf2b586b02382"
+    }
+  ],
+  "status": "Pinned unmodified author source; integration/configuration adaptations must be recorded separately"
+}

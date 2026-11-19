@@ -1,0 +1,22 @@
+{
+  "scope": "Aggregate technical availability and source replay counts only. No patient identifiers or image files are included.",
+  "cohort": "TCGA-KIRC",
+  "clinical_cohort_patients": 217,
+  "recorded_OS_deaths": 66,
+  "feature_bag_counts": {
+    "clinical": 217,
+    "WSI": 43,
+    "CT_radiology": 70,
+    "RNA": 217
+  },
+  "strict_four_input_intersection": {"patients": 27, "observed_OS_deaths": 7},
+  "independent_cohort_reconstruction": "passed",
+  "original_source_replay": {
+    "previously_audited_WSI_bags": 37,
+    "replayed_WSI_patches": 4736,
+    "CT_bags": 70,
+    "rehashed_selected_DICOM_slices": 5081,
+    "expanded_43_bag_WSI_replay": "pending"
+  },
+  "modeling_decision": "No four-input survival model was fit. Seven deaths are inadequate for the intended locked evaluation; this is technical feasibility evidence only."
+}

@@ -1,0 +1,16 @@
+# Reproducibility snapshot of the actually tested Windows/Python 3.11 environment.
+# CPU PyTorch wheels may require the official https://download.pytorch.org/whl/cpu index.
+# Additional optional image readers are in requirements-imaging.txt.
+torch==2.1.2
+torchvision==0.16.2
+numpy==1.26.4
+pandas==2.3.3
+scipy==1.16.3
+scikit-learn==1.5.2
+matplotlib==3.11.0
+fastapi==0.111.0
+pydantic==2.7.1
+httpx==0.27.0
+uvicorn==0.29.0
+anyio==4.12.1
+starlette==0.37.2

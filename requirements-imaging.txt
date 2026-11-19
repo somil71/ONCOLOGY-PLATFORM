@@ -1,0 +1,5 @@
+# Optional SVS reader used by tools/run_image_pilot.py; installed in isolation for this audit.
+openslide-python==1.4.7
+openslide-bin==4.0.1.2
+pydicom>=2.4,<4
+Pillow>=9.5

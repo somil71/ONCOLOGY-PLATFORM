@@ -61,3 +61,28 @@ desktop.ini
 .idea/
 *.sublime-project
 *.sublime-workspace
+
+# Local research case inputs and inference history
+runtime/
+
+# Raw cohort inputs and local experiment exports must not enter source control.
+data/
+RUN REPORT/
+artifacts/
+paper_figures/run_25_review_only/
+IEEE_Paper_Handoff/figures/run_25_review_only/
+
+# Downloaded research inputs and derived matrices (retain provenance manifests)
+data/tcga-brca/rna-primary/*.tsv
+data/tcga-brca/rna-primary/*.partial
+data/tcga-brca/wsi-pilot/*.svs
+data/metabric/data_mrna*.txt
+data/processed/*.npz
+data/processed/kirc_wsi_features/**/*.npz
+data/processed/kirc_ct_features/**/*.npz
+data/tcia-brca/pilot-dicom/
+data/tcga-kirc/rna-primary/*.tsv
+data/tcga-kirc/wsi-diagnostic/*.svs
+data/tcia-kirc/pilot-dicom/
+data/tcia-kirc/dicom/
+*.partial

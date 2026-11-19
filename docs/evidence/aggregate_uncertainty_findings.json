@@ -1,0 +1,12 @@
+{
+  "scope": "Exploratory held-out analysis only; no probability-of-error calibration was fitted.",
+  "KIRC_attention_5_year_disagreement_error_correlation": {
+    "estimate": 0.0321,
+    "conditional_95_percent_interval": [-0.1401, 0.2247]
+  },
+  "KIRC_RNA_withheld_from_concatenation": {
+    "Brier_error_change": {"estimate": 0.0912, "paired_95_percent_interval": [0.0460, 0.1340]},
+    "ensemble_disagreement_change": {"estimate": -0.0136, "paired_95_percent_interval": [-0.0166, -0.0108]}
+  },
+  "interpretation": "Disagreement is not calibrated confidence; lower disagreement can accompany worse prediction error."
+}

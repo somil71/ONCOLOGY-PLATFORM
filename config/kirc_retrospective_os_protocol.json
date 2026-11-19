@@ -1,0 +1,272 @@
+{
+  "protocol_id": "KIRC-retrospective-OS-v1",
+  "locked_at_utc": "2026-11-18T10:53:02.322654+00:00",
+  "status": "Locked candidate analysis plan before KIRC performance evaluation; full image acquisition/QC pending",
+  "study_scope": "Separate TCGA-KIRC retrospective OS association; no BRCA pooling, pan-cancer generalization or prospective diagnosis-time claim",
+  "clinical_source": "data/processed/tcga_kirc_clinical.csv",
+  "clinical_source_sha256": "8e24f0492b047c5cdf85c7a47abb40264359e998c6b24dec99bde6b0d57c023c",
+  "candidate_patients": 217,
+  "candidate_os_deaths": 66,
+  "endpoint": {
+    "name": "OS",
+    "source": "Original TCGA-CDR OS/OS.time",
+    "unit": "days",
+    "time_origin": "Recorded CDR diagnosis origin; not shifted by BCR receipt or DICOM calendar dates",
+    "postcollection_landmark": false,
+    "prospective_prediction_time_eligibility_verified": false
+  },
+  "predictors": {
+    "primary_clinical": [
+      "age_years"
+    ],
+    "retrospective_sensitivity_clinical": [
+      "age_years",
+      "pathologic_stage"
+    ],
+    "forbidden": "Outcome, death, followup, last contact, receipt timing and identifiers as predictors; stages limited to declared sensitivity study",
+    "rna": "Selected primary-tumour log1p TPM; variable-gene selection and all transforms fitted on training partition only",
+    "images": "Actual source-verified primary WSI and CT bags; pooled mean of VALID items is shared-feature baseline, not MCAT or patch cross-attention"
+  },
+  "timing_definition": {
+    "days_to_collection": "BCR/processing-centre receipt, not patient sampling",
+    "days_to_sample_procurement": "Procedure/removal from patient",
+    "rna_procurement": "Unknown; cannot assume baseline",
+    "unknown_timing_policy": "Retain only for explicitly retrospective association with sensitivity/limitations; no clinical deployment eligibility inferred"
+  },
+  "partitions": {
+    "unit": "patient",
+    "outer_folds": 5,
+    "outer_stratification": "recorded OS event",
+    "outer_seed": 42,
+    "ordering": "ascending Patient_ID before assignment",
+    "inner_validation_fraction_of_outer_development": 0.2,
+    "inner_seed_formula": "1042 + 1-based outer fold",
+    "fold_counts": {
+      "1": {
+        "train": {
+          "patients": 138,
+          "deaths": 41
+        },
+        "validation": {
+          "patients": 35,
+          "deaths": 11
+        },
+        "test": {
+          "patients": 44,
+          "deaths": 14
+        }
+      },
+      "2": {
+        "train": {
+          "patients": 138,
+          "deaths": 42
+        },
+        "validation": {
+          "patients": 35,
+          "deaths": 11
+        },
+        "test": {
+          "patients": 44,
+          "deaths": 13
+        }
+      },
+      "3": {
+        "train": {
+          "patients": 139,
+          "deaths": 42
+        },
+        "validation": {
+          "patients": 35,
+          "deaths": 11
+        },
+        "test": {
+          "patients": 43,
+          "deaths": 13
+        }
+      },
+      "4": {
+        "train": {
+          "patients": 139,
+          "deaths": 42
+        },
+        "validation": {
+          "patients": 35,
+          "deaths": 11
+        },
+        "test": {
+          "patients": 43,
+          "deaths": 13
+        }
+      },
+      "5": {
+        "train": {
+          "patients": 139,
+          "deaths": 42
+        },
+        "validation": {
+          "patients": 35,
+          "deaths": 11
+        },
+        "test": {
+          "patients": 43,
+          "deaths": 13
+        }
+      }
+    },
+    "immutable_after_image_qc": true
+  },
+  "fold_ledgers": [
+    {
+      "fold": 1,
+      "path": "data/processed/kirc-fixed-folds/fold_01.csv",
+      "sha256": "bee7491fbf7344167a412020d8da4d39457be6198469c27eb23aadf3ca75548d"
+    },
+    {
+      "fold": 2,
+      "path": "data/processed/kirc-fixed-folds/fold_02.csv",
+      "sha256": "3ed8dabfeec810133a07b5ce2d737a1ac52b34424a498c8dc3a4382aebce7600"
+    },
+    {
+      "fold": 3,
+      "path": "data/processed/kirc-fixed-folds/fold_03.csv",
+      "sha256": "51cedb8c2c61cea0263aad1a2696b19cdb52fa86c15d29478e7fe72454f2a831"
+    },
+    {
+      "fold": 4,
+      "path": "data/processed/kirc-fixed-folds/fold_04.csv",
+      "sha256": "686c26432bf6daad0c8f54d7d1e1a1709aa637438e7c0ec443ebfbb3b253923c"
+    },
+    {
+      "fold": 5,
+      "path": "data/processed/kirc-fixed-folds/fold_05.csv",
+      "sha256": "ce5428536124a7a84820ec5ca2d06de46938a88bbf1abc80e8707c4d8711dad4"
+    }
+  ],
+  "qc_exclusions": {
+    "rule": "Outcome-blind technical/identity/histology QC; record patient, source hash and reason before model evaluation",
+    "retain_original_assignment": true,
+    "no_event_based_replacement_or_resplitting": true,
+    "compare_models_on_identical_admitted_patients": true,
+    "if_fewer_than_two_events_in_any_partition": "Mark affected experiment data_constrained; no arbitrary resplit"
+  },
+  "four_input_admission": [
+    "Each patient has exact case-linked CLI/RNA/primary diagnostic WSI/CT identity",
+    "Raw source checksums or verified extraction provenance plus feature hashes",
+    "Finite nonempty feature bags with binary valid-item masks and declared physical preprocessing",
+    "CT patient/series/frame, physical ordering, geometry, HU, protocol/anatomy/phase QC recorded",
+    "WSI primary sample, known physical MPP, deterministic tissue/patch QC and weights recorded",
+    "No all-missing input; missing values and padded items never treated as observations"
+  ],
+  "hypotheses": {
+    "primary_H1": "Attention with explicit masking and training modality dropout0.3 improves missing-input robustness versus identical masked attention with dropout0",
+    "primary_subset_panel": [
+      [
+        "cli"
+      ],
+      [
+        "rna"
+      ],
+      [
+        "wsi"
+      ],
+      [
+        "rad"
+      ],
+      [
+        "cli",
+        "rna"
+      ],
+      [
+        "cli",
+        "wsi"
+      ],
+      [
+        "cli",
+        "rad"
+      ],
+      [
+        "rna",
+        "wsi"
+      ],
+      [
+        "rna",
+        "rad"
+      ],
+      [
+        "wsi",
+        "rad"
+      ],
+      [
+        "cli",
+        "rna",
+        "wsi"
+      ],
+      [
+        "cli",
+        "rna",
+        "rad"
+      ],
+      [
+        "cli",
+        "wsi",
+        "rad"
+      ],
+      [
+        "rna",
+        "wsi",
+        "rad"
+      ],
+      [
+        "cli",
+        "rna",
+        "wsi",
+        "rad"
+      ]
+    ],
+    "primary_summary": "Equal mean Harrell C across all15 nonempty subsets within each outer fold, then equal mean across5outer folds",
+    "primary_paired_contrast": "dropout0.3 minus dropout0; identical patients/subsets/folds and seed ensemble",
+    "complete_input_guardrail": "Report complete-input C, Brier and calibration separately; an aggregate cannot hide degradation",
+    "secondary": "Clinical/unimodal/concatenation/mean comparisons, dropout0.1/0.5, stage sensitivity, uncertainty and phase/site analyses exploratory"
+  },
+  "training": {
+    "seeds": [
+      42,
+      123,
+      2026
+    ],
+    "selection": "Inner-validation censored likelihood; no outer performance tuning",
+    "transforms": "Training-only imputation/scaling/gene selection/dictionaries; frozen externally pretrained encoders permitted with provenance",
+    "all_missing_dropout": "Restore one uniformly selected actually available input; do not always retain clinical input"
+  },
+  "evaluation": {
+    "primary_metric": "Harrell C, higher risk means earlier death",
+    "horizons_days": [
+      365,
+      1095,
+      1825
+    ],
+    "horizon_policy": "Descriptive IPCW AUC/Brier/Uno and calibration only with positive censoring support, observed cases and controls; unsupported->not_evaluated",
+    "report_counts": "Per-fold patients/deaths, cases/controls/early censoring, G(t), weight extremes and valid bootstrap replicates",
+    "sparse_warning_convention": "Fewer than10 cases or10 controls flagged descriptive instability; not a universal statistical adequacy rule",
+    "fold_summary": "Fold-specific risks/metrics; no arbitrary pooling of unscaled Cox risk across fitted folds",
+    "bootstrap": {
+      "replicates": 1000,
+      "seed": 20261118,
+      "unit": "patient, paired across models/subsets within outer fold",
+      "scope": "Conditional on fitted models/fixed folds; does not cover training-selection uncertainty or justify independent-fold significance claims"
+    },
+    "censoring": "Training-reference reverse KM per internal fold; independent censoring assumption and weight diagnostics disclosed",
+    "multiplicity": "One primary H1 contrast; other comparisons exploratory, no uncorrected multi-contrast superiority claim",
+    "external": "No independent paired four-input KIRC cohort currently verified"
+  },
+  "uncertainty": {
+    "baseline": "Censored survival likelihood and3independently trained seeds; survival-probability SD is empirical disagreement",
+    "validation": "Held-out IPCW error association, calibration, selective risk and missing-input stress with intervals",
+    "edl": "Not validated; no Dirichlet classification loss on continuous risk/followup, no confidence claim from evidence magnitude"
+  },
+  "published_baselines": {
+    "MultiSurv": "Pinned author mRNA-only model/loss feasible; shared-cohort preprocessing/training adaptations recorded separately. Official model has no CT branch and current pooled ViT/RAD vectors do not reproduce its WSI/clinical pathways",
+    "MCAT": "Requires actual patch bags and six curated genomic functional groups with author source/config; pooled four tokens are incompatible",
+    "PathomicFusion": "Requires original pathology/cell-graph/genomic representations and tensor gating; ordinary concatenation is not a reproduction"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "cancerfusion.image-cohort-lock.v1",
+  "decision": "EXAMPLE_ONLY_NOT_AN_ADMISSION_LOCK",
+  "locked_at_utc": "ROOT_SETS_AFTER_FINAL_OUTCOME_BLIND_AVAILABILITY_AND_QC_REVIEW",
+  "prospective_prediction_eligible": false,
+  "outcome_blind_qc_confirmed": false,
+  "patient_fold_policy": "retain_original_locked_assignments_no_resplitting",
+  "candidate_clinical_sha256": "ROOT_BINDS_ORIGINAL_217_PATIENT_CLINICAL_SOURCE",
+  "admitted_patient_ids": [],
+  "admitted_patients": 0,
+  "admitted_os_deaths": 0,
+  "sources": {
+    "patient_features": {"path": "POST_QC_OUTPUT/patient_features.csv", "sha256": "ROOT_SETS"},
+    "modalities": {"path": "POST_QC_OUTPUT/modalities.json", "sha256": "ROOT_SETS"},
+    "study_protocol": {"path": "config/kirc_retrospective_os_protocol.json", "sha256": "ROOT_SETS"},
+    "rna_matrix": {"path": "data/processed/tcga_kirc_rna_logtpm.npz", "sha256": "ROOT_SETS"},
+    "cohort_contract": {"path": "POST_QC_OUTPUT/cohort_contract.json", "sha256": "ROOT_SETS"},
+    "independent_input_audit": {"path": "POST_QC_OUTPUT/independent_input_validation.json", "sha256": "ROOT_SETS"}
+  },
+  "review_evidence": ["ROOT_RECORDS_FINAL_AVAILABILITY_SOURCE_HASH_AND_QC_EXCLUSION_REASONS"]
+}

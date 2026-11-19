@@ -1,0 +1,26 @@
+{
+  "scope": "Aggregate metrics only. No patient-level identifiers or predictions are included.",
+  "KIRC_locked_five_fold": {
+    "patients": 217,
+    "observed_OS_deaths": 66,
+    "metrics": {
+      "age_only_cox_c_index": {"estimate": 0.6494, "conditional_95_percent_interval": [0.5784, 0.7204]},
+      "RNA_only_neural_c_index": {"estimate": 0.6865, "conditional_95_percent_interval": [0.6091, 0.7566]},
+      "age_RNA_concatenation_c_index": {"estimate": 0.7077, "conditional_95_percent_interval": [0.6315, 0.7804]},
+      "age_RNA_attention_c_index": {"estimate": 0.7029, "conditional_95_percent_interval": [0.6260, 0.7683]},
+      "adapted_author_source_MultiSurv_RNA_c_index": {"estimate": 0.6792, "conditional_95_percent_interval": [0.6042, 0.7438]}
+    },
+    "paired_concatenation_minus_age_Cox": {"estimate": 0.0582, "conditional_95_percent_interval": [-0.0316, 0.1478]},
+    "interpretation": "Survival ranking C-index, not classification accuracy. Paired interval includes no difference; fusion superiority is not established."
+  },
+  "BRCA_held_out_clinical_RNA": {
+    "patients": 216,
+    "observed_OS_deaths": 30,
+    "metrics": {
+      "age_only_cox_c_index": {"estimate": 0.5360, "conditional_95_percent_interval": [0.3878, 0.6834]},
+      "age_RNA_concatenation_c_index": {"estimate": 0.6423, "conditional_95_percent_interval": [0.5298, 0.7489]},
+      "age_RNA_attention_c_index": {"estimate": 0.5983, "conditional_95_percent_interval": [0.4793, 0.7161]}
+    },
+    "interpretation": "Survival ranking C-index, not classification accuracy. Paired superiority was not established."
+  }
+}

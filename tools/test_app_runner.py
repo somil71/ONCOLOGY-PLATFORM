@@ -1,125 +1,108 @@
-import sys
+from concurrent.futures import ThreadPoolExecutor
+import json
 import os
-sys.stdout.reconfigure(encoding='utf-8')
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+import torch
 from streamlit.testing.v1 import AppTest
 
-print("="*70)
-print("  AUTOMATED END-TO-END CLINICAL TEST SUITE (CancerFusion AI)")
-print("="*70)
+from src.architecture import CancerFusionResearchPlatform
+from src.case_inference import demo_features, feature_shapes, read_case_features, run_case
+from src.case_store import CaseStore, report_markdown
 
-# TEST 1: Home View
-print("\n[Test 1] Testing '🏠 Home' Landing Page...")
-at_home = AppTest.from_file("app.py", default_timeout=30)
-at_home.session_state["main_navbar"] = "🏠 Home"
-at_home.session_state["current_nav"] = "🏠 Home"
-at_home.run()
 
-if at_home.exception:
-    print(f"FAILED in Home View: {at_home.exception}")
-    sys.exit(1)
+ROOT = Path(__file__).resolve().parents[1]
 
-hero_found = any("Deep Multimodal Precision Oncology" in m.value for m in at_home.markdown)
-pillars_found = any("Gated-MIL Pathology" in m.value for m in at_home.markdown)
-print(f"   • Hero Banner Present:    {hero_found}")
-print(f"   • Core 4 Pillars Present: {pillars_found}")
-assert hero_found and pillars_found, "Home page content missing!"
-print("PASSED: [🏠 Home] View verified with 0 exceptions!")
 
-# TEST 2: Clinical Intake View & Benchmark Loading
-print("\n[Test 2] Testing '📝 Clinical Case Intake' (Benchmark Preset)...")
-at_intake = AppTest.from_file("app.py", default_timeout=30)
-at_intake.session_state["main_navbar"] = "📝 Clinical Case Intake"
-at_intake.session_state["current_nav"] = "📝 Clinical Case Intake"
-at_intake.run()
+def assert_clean(app):
+    assert not app.exception, app.exception
 
-if at_intake.exception:
-    print(f"FAILED in Intake View: {at_intake.exception}")
-    sys.exit(1)
 
-run_btns = [b for b in at_intake.button if "Execute Multimodal" in b.label]
-assert len(run_btns) > 0, "Execute button not found in Intake view!"
-run_btns[0].click().run()
+def verify_storage_and_inputs(database):
+    state = torch.load(ROOT / "RUN REPORT" / "CancerFusion_Phase2_Weights.pth", map_location="cpu", weights_only=True)
+    model = CancerFusionResearchPlatform(
+        rna_dim=state["rna_encoder.encoder.0.weight"].shape[1],
+        cli_dim=state["cli_encoder.net.0.weight"].shape[1],
+        max_slices=state["rad_encoder.pos_embedding"].shape[1],
+    ).eval()
+    model.load_state_dict(state)
+    shapes = feature_shapes(model)
+    features = read_case_features(json.dumps({"cli": [0.0] * shapes["cli"][0]}).encode(), shapes)
+    risk, uncertainty, weights = run_case(model, shapes, features, ["cli"])
+    assert weights == [[0.0, 0.0, 0.0, 1.0]] * 2
+    for payload in (b'{"cli":[0]}', b'{}', b'{"unexpected":[1]}'):
+        try:
+            read_case_features(payload, shapes)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("Accepted an invalid feature upload")
+    try:
+        run_case(model, shapes, features, [])
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Accepted an all-missing inference request")
 
-if at_intake.exception:
-    print(f"FAILED when clicking Execute: {at_intake.exception}")
-    sys.exit(1)
+    store = CaseStore(database)
+    case_id = store.create_case("BRCA-TEST", "uploaded features", features)
+    outputs = [
+        {"condition": condition, "risk": risk[i], "uncertainty": uncertainty[i], "weights": dict(zip(shapes, weights[i]))}
+        for i, condition in enumerate(("All supplied inputs", "Selected inputs"))
+    ]
+    def save(_):
+        return store.save_run(case_id, {"sha256": "test-checkpoint"}, ["cli"], outputs)
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        reports = list(pool.map(save, range(4)))
+    assert len({report["run_id"] for report in reports}) == 1
+    assert len(CaseStore(database).list_runs(case_id)) == 1
+    assert "uploaded features" in report_markdown(reports[0])
+    try:
+        store.create_case("BRCA-TEST", "uploaded features", features)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Duplicate case code accepted")
+    assert len(store.list_cases()) == 1
+    assert json.loads(store.get_case(case_id)["features"])["cli"] == [0.0] * shapes["cli"][0]
 
-print(f"   • Navigated to: {at_intake.session_state.current_nav}")
-print(f"   • Has Run Flag: {at_intake.session_state.has_run}")
-print("PASSED: [📝 Clinical Case Intake] Benchmark inference executed cleanly!")
 
-# TEST 3: Results Dashboard View
-print("\n[Test 3] Testing '🔬 Analysis & Model Results' Dashboard...")
-at_results = AppTest.from_file("app.py", default_timeout=30)
-at_results.session_state["main_navbar"] = "🔬 Analysis & Model Results"
-at_results.session_state["current_nav"] = "🔬 Analysis & Model Results"
-at_results.session_state["has_run"] = True
-# Seed patient data
-at_results.session_state["patient_data"] = {
-    "id": "TCGA-AR-A1AQ",
-    "stage": "Stage IIIB Locally Advanced",
-    "tnm": "T3 N2a M0",
-    "grade": "Nottingham Grade 3",
-    "subtype": "Triple-Negative (TNBC)",
-    "receptors": {"ER": "Negative (-)", "PR": "Negative (-)", "HER2": "Negative (0)", "Ki67": 78},
-    "age": 49,
-    "risk": 0.7640,
-    "unc": 0.2810,
-    "weights": {"wsi": 0.385, "rad": 0.275, "rna": 0.230, "cli": 0.110},
-    "mask": [True, True, True, True],
-    "genes": {"BRCA1": "+3.4σ", "TP53": "+3.8σ", "PIK3CA": "+0.4σ", "ESR1": "-2.8σ", "PTEN": "-2.1σ"},
-    "hallmarks": {"DNA Damage Repair Defect": 2.95, "Cell Cycle Proliferation": 3.10, "EMT": 2.45}
-}
-at_results.run()
+def main():
+    torch.set_num_threads(2)
+    with TemporaryDirectory() as folder:
+        verify_storage_and_inputs(Path(folder) / "storage.sqlite3")
+        os.environ["CANCERFUSION_DB"] = str(Path(folder) / "app.sqlite3")
+        app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=60).run()
+        assert_clean(app)
+        for slug, heading in (("platform", "Platform"), ("research", "Research"), ("figures", "Figures"), ("workspace", "Case workspace")):
+            app.query_params["page"] = slug
+            app.run()
+            assert_clean(app)
+            assert any(f"<h1>{heading}</h1>" in item.value for item in app.markdown)
+        app.text_input[0].set_value("DEMO-TEST")
+        next(button for button in app.button if button.label == "Save case").click().run()
+        assert_clean(app)
+        assert app.selectbox[0].format_func(app.selectbox[0].value).startswith("DEMO-TEST")
+        app.checkbox[1].uncheck().run()
+        next(button for button in app.button if button.label == "Run and record comparison").click().run()
+        assert_clean(app)
+        assert len(CaseStore(os.environ["CANCERFUSION_DB"]).list_cases()) == 1
+        runs = CaseStore(os.environ["CANCERFUSION_DB"]).list_runs(app.session_state["saved_case"])
+        assert len(runs) == 1
+        assert runs[0]["outputs"][1]["weights"]["rad"] == 0.0
+        app.run()
+        assert_clean(app)
+        assert len(app.get("download_button")) == 2
+        # A new browser session can recover the same case and result.
+        reopened = AppTest.from_file(str(ROOT / "app.py"), default_timeout=60)
+        reopened.query_params["page"] = "workspace"
+        reopened.run()
+        assert_clean(reopened)
+        assert len(reopened.get("download_button")) == 2
+        os.environ.pop("CANCERFUSION_DB")
+    print("PASS: pages, case creation, persisted results, missing RAD, exports, input validation and concurrent retry deduplication.")
 
-if at_results.exception:
-    print(f"FAILED in Results Dashboard: {at_results.exception}")
-    sys.exit(1)
 
-md_texts = [m.value for m in at_results.markdown]
-has_hazard = any("Predicted Survival Hazard" in t for t in md_texts)
-has_unc = any("Dirichlet Uncertainty" in t for t in md_texts)
-has_cindex = any("Harrell's Concordance Index" in t for t in md_texts)
-print(f"   • Predicted Hazard KPI:     {has_hazard}")
-print(f"   • Dirichlet Uncertainty KPI: {has_unc}")
-print(f"   • Harrell's C-Index KPI:    {has_cindex}")
-assert has_hazard and has_unc and has_cindex, "Core KPIs missing in Results dashboard!"
-print("PASSED: [🔬 Analysis & Model Results] View verified with 0 exceptions!")
-
-# TEST 4: Research Benchmarks View
-print("\n[Test 4] Testing '📊 Research Benchmarks' View...")
-at_bench = AppTest.from_file("app.py", default_timeout=30)
-at_bench.session_state["main_navbar"] = "📊 Research Benchmarks"
-at_bench.session_state["current_nav"] = "📊 Research Benchmarks"
-at_bench.run()
-
-if at_bench.exception:
-    print(f"FAILED in Benchmarks View: {at_bench.exception}")
-    sys.exit(1)
-
-has_table = len(at_bench.dataframe) >= 2
-print(f"   • Benchmark DataFrames Present: {has_table} ({len(at_bench.dataframe)} tables)")
-assert has_table, "Benchmark data tables missing!"
-print("PASSED: [📊 Research Benchmarks] View verified with 0 exceptions!")
-
-# TEST 5: Tumor Board Dossier View
-print("\n[Test 5] Testing '📄 Tumor Board Dossier' View...")
-at_dossier = AppTest.from_file("app.py", default_timeout=30)
-at_dossier.session_state["main_navbar"] = "📄 Tumor Board Dossier"
-at_dossier.session_state["current_nav"] = "📄 Tumor Board Dossier"
-at_dossier.run()
-
-if at_dossier.exception:
-    print(f"FAILED in Dossier View: {at_dossier.exception}")
-    sys.exit(1)
-
-has_dossier_text = any("CLINICAL PROGNOSTIC DOSSIER" in m.value for m in at_dossier.markdown)
-has_dl_button = len(at_dossier.get("download_button")) > 0
-print(f"   • Clinical Dossier Present:      {has_dossier_text}")
-print(f"   • Official Download Button Active: {has_dl_button}")
-assert has_dossier_text and has_dl_button, "Dossier or download button missing!"
-print("PASSED: [📄 Tumor Board Dossier] View verified with 0 exceptions!")
-
-print("\n" + "="*70)
-print("  🎉 COMPLETE TEST SUITE: 5/5 VIEWS 100% PASSED WITH ZERO EXCEPTIONS!")
-print("="*70)
+if __name__ == "__main__":
+    main()
